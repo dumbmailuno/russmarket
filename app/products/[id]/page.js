@@ -8,14 +8,7 @@ const CRYPTO_OPTIONS = [
   { value: 'eth', label: 'Ethereum', symbol: 'ETH', coingecko: 'ethereum', imgId: '279' },
   { value: 'sol', label: 'Solana', symbol: 'SOL', coingecko: 'solana', imgId: '4128' },
   { value: 'ltc', label: 'Litecoin', symbol: 'LTC', coingecko: 'litecoin', imgId: '2' },
-  { value: 'xrp', label: 'XRP', symbol: 'XRP', coingecko: 'ripple', imgId: '44' },
-  { value: 'trx', label: 'Tron', symbol: 'TRX', coingecko: 'tron', imgId: '1094' },
   { value: 'usdttrc20', label: 'Tether TRC20', symbol: 'USDT', coingecko: 'tether', imgId: '325' },
-  { value: 'usdterc20', label: 'Tether ERC20', symbol: 'USDT', coingecko: 'tether', imgId: '325' },
-  { value: 'usdcsol', label: 'USD Coin', symbol: 'USDC', coingecko: 'usd-coin', imgId: '6319' },
-  { value: 'bnbbsc', label: 'BNB', symbol: 'BNB', coingecko: 'binancecoin', imgId: '825' },
-  { value: 'matic', label: 'Polygon', symbol: 'MATIC', coingecko: 'matic-network', imgId: '4713' },
-  { value: 'doge', label: 'Dogecoin', symbol: 'DOGE', coingecko: 'dogecoin', imgId: '5' },
 ]
 
 function CryptoIcon({ coingecko, imgId, symbol, size = 32 }) {
