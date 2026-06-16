@@ -708,19 +708,51 @@ function OrdersPage({ token }) {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const [verifying, setVerifying] = useState(null)
+  const [verifySuccess, setVerifySuccess] = useState('')
+  const [verifyError, setVerifyError] = useState('')
 
-  useEffect(() => {
-    fetch('/api/admin/orders', {
+  useEffect(() => { loadOrders() }, [])
+
+  const loadOrders = async () => {
+    const res = await fetch('/api/admin/orders', {
       headers: { 'Authorization': 'Bearer ' + token }
-    }).then(r => r.json()).then(d => {
-      setOrders(d.orders || [])
-      setLoading(false)
     })
-  }, [])
+    const data = await res.json()
+    setOrders(data.orders || [])
+    setLoading(false)
+  }
+
+  const verifyPayment = async (order_id) => {
+    setVerifying(order_id)
+    setVerifyError('')
+    setVerifySuccess('')
+
+    const res = await fetch('/api/admin/verify-payment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ order_id })
+    })
+
+    const data = await res.json()
+    setVerifying(null)
+
+    if (res.ok) {
+      setVerifySuccess('Payment verified. Download email sent to buyer.')
+      loadOrders()
+    } else {
+      setVerifyError(data.error || 'Verification failed.')
+    }
+  }
 
   const filtered = orders.filter(o =>
     filter === 'all' ? true : o.payment_status === filter
   )
+
+  const pendingCount = orders.filter(o => o.payment_status === 'pending').length
 
   const selectStyle = {
     backgroundColor: '#111', border: '1px solid #1a1a1a',
@@ -734,48 +766,137 @@ function OrdersPage({ token }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '1.4rem', fontWeight: '700', marginBottom: '0.1rem' }}>Orders</h1>
-          <p style={{ color: '#555', fontSize: '0.875rem' }}>{filtered.length} orders</p>
+          <p style={{ color: '#555', fontSize: '0.875rem' }}>
+            {filtered.length} orders
+            {pendingCount > 0 && (
+              <span style={{
+                marginLeft: '0.5rem',
+                backgroundColor: 'rgba(234,179,8,0.15)',
+                border: '1px solid rgba(234,179,8,0.3)',
+                color: '#facc15', padding: '0.1rem 0.5rem',
+                borderRadius: '999px', fontSize: '0.7rem', fontWeight: '600'
+              }}>
+                {pendingCount} need verification
+              </span>
+            )}
+          </p>
         </div>
         <select value={filter} onChange={e => setFilter(e.target.value)} style={selectStyle}>
           <option value="all">All Orders</option>
-          <option value="paid">Paid</option>
           <option value="pending">Pending</option>
+          <option value="paid">Verified</option>
         </select>
       </div>
 
+      {verifySuccess && (
+        <div style={{
+          backgroundColor: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)',
+          borderRadius: '8px', padding: '0.75rem 1rem', color: '#4ade80',
+          fontSize: '0.875rem', marginBottom: '1.25rem'
+        }}>
+          {verifySuccess}
+        </div>
+      )}
+
+      {verifyError && (
+        <div style={{
+          backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+          borderRadius: '8px', padding: '0.75rem 1rem', color: '#f87171',
+          fontSize: '0.875rem', marginBottom: '1.25rem'
+        }}>
+          {verifyError}
+        </div>
+      )}
+
       {loading ? <p style={{ color: '#555' }}>Loading...</p>
         : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '4rem', border: '1px dashed #1a1a1a', borderRadius: '12px', color: '#555' }}>No orders found.</div>
+          <div style={{ textAlign: 'center', padding: '4rem', border: '1px dashed #1a1a1a', borderRadius: '12px', color: '#555' }}>
+            No orders found.
+          </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {filtered.map(order => (
               <div key={order.id} style={{
-                backgroundColor: '#111', border: '1px solid #1a1a1a',
-                borderRadius: '12px', padding: '1rem 1.25rem',
-                display: 'flex', justifyContent: 'space-between',
-                alignItems: 'center', flexWrap: 'wrap', gap: '1rem'
+                backgroundColor: order.payment_status === 'pending' ? 'rgba(234,179,8,0.03)' : '#111',
+                border: '1px solid ' + (order.payment_status === 'pending' ? 'rgba(234,179,8,0.2)' : '#1a1a1a'),
+                borderRadius: '12px', padding: '1.25rem 1.5rem',
               }}>
-                <div>
-                  <p style={{ fontWeight: '600', fontSize: '0.875rem', marginBottom: '0.2rem' }}>
-                    #{order.id.slice(0, 8).toUpperCase()}
-                  </p>
-                  <p style={{ color: '#555', fontSize: '0.75rem' }}>
-                    {new Date(order.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div>
+                    <p style={{ fontWeight: '600', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                      #{order.id.slice(0, 8).toUpperCase()}
+                      {order.payment_status === 'pending' && (
+                        <span style={{
+                          marginLeft: '0.5rem', fontSize: '0.65rem',
+                          backgroundColor: 'rgba(234,179,8,0.15)',
+                          color: '#facc15', padding: '0.15rem 0.45rem',
+                          borderRadius: '999px', fontWeight: '600'
+                        }}>
+                          AWAITING VERIFICATION
+                        </span>
+                      )}
+                    </p>
+                    <p style={{ color: '#555', fontSize: '0.75rem', marginBottom: '0.5rem' }}>
+                      {new Date(order.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                    <p style={{ color: '#777', fontSize: '0.78rem' }}>
+                      {order.products?.name || 'Unknown Product'}
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <p style={{ fontSize: '0.85rem', color: '#a5b4fc', fontWeight: '600' }}>
+                        ${order.amount_paid} USD
+                      </p>
+                      <p style={{ fontSize: '0.72rem', color: '#444' }}>
+                        via {order.crypto_currency?.toUpperCase()}
+                      </p>
+                    </div>
+
+                    <span style={{
+                      backgroundColor: order.payment_status === 'paid' ? 'rgba(34,197,94,0.1)' : 'rgba(234,179,8,0.1)',
+                      border: '1px solid ' + (order.payment_status === 'paid' ? 'rgba(34,197,94,0.3)' : 'rgba(234,179,8,0.3)'),
+                      color: order.payment_status === 'paid' ? '#4ade80' : '#facc15',
+                      padding: '0.2rem 0.6rem', borderRadius: '999px',
+                      fontSize: '0.7rem', fontWeight: '500'
+                    }}>
+                      {order.payment_status === 'paid' ? 'Verified' : 'Pending'}
+                    </span>
+
+                    {order.payment_status === 'pending' && (
+                      <button
+                        onClick={() => verifyPayment(order.id)}
+                        disabled={verifying === order.id}
+                        style={{
+                          backgroundColor: verifying === order.id ? '#222' : '#22c55e',
+                          border: 'none', color: 'white',
+                          padding: '0.5rem 1rem', borderRadius: '6px',
+                          fontSize: '0.8rem', fontWeight: '600',
+                          cursor: verifying === order.id ? 'not-allowed' : 'pointer',
+                          fontFamily: 'Poppins, sans-serif'
+                        }}
+                      >
+                        {verifying === order.id ? 'Verifying...' : 'Verify Payment'}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <span style={{ fontSize: '0.85rem', color: '#a5b4fc', fontWeight: '600' }}>
-                    {order.amount_paid} {order.crypto_currency?.toUpperCase()}
-                  </span>
-                  <span style={{
-                    backgroundColor: order.payment_status === 'paid' ? 'rgba(34,197,94,0.1)' : 'rgba(234,179,8,0.1)',
-                    border: '1px solid ' + (order.payment_status === 'paid' ? 'rgba(34,197,94,0.3)' : 'rgba(234,179,8,0.3)'),
-                    color: order.payment_status === 'paid' ? '#4ade80' : '#facc15',
-                    padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: '500'
+
+                {/* Wallet address for reference */}
+                {order.payment_status === 'pending' && order.pay_address && (
+                  <div style={{
+                    marginTop: '1rem', paddingTop: '1rem',
+                    borderTop: '1px solid #1a1a1a'
                   }}>
-                    {order.payment_status === 'paid' ? 'Paid' : 'Pending'}
-                  </span>
-                </div>
+                    <p style={{ fontSize: '0.72rem', color: '#444', marginBottom: '0.25rem' }}>
+                      Expected wallet address
+                    </p>
+                    <p style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: '#666', wordBreak: 'break-all' }}>
+                      {order.pay_address}
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
