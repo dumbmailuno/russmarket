@@ -111,6 +111,18 @@ export default async function HomePage() {
             }}>
               Create Account
             </a>
+            <a href="https://t.me/russmarket2023" style={{
+              backgroundColor: 'transparent',
+              color: 'var(--text)',
+              padding: '0.85rem 2rem',
+              borderRadius: '8px',
+              fontWeight: '600',
+              fontSize: '1rem',
+              border: '1px solid var(--border)',
+              display: 'inline-block'
+            }}>
+              Russmarket Support
+            </a>
           </div>
         </div>
       </div>
