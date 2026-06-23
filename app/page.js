@@ -1,6 +1,8 @@
 import ProductsSection from './components/ProductsSection'
 import Nav from './components/Nav'
 
+export const revalidate = 0
+
 async function getProducts() {
   try {
     const { supabaseAdmin } = await import('@/app/lib/supabase')

@@ -19,6 +19,14 @@ export default function Nav() {
     window.location.href = '/'
   }
 
+  const TelegramIcon = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+  )
+
   return (
     <>
       <nav style={{
@@ -38,13 +46,24 @@ export default function Nav() {
         </a>
 
         {/* Desktop Links */}
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          alignItems: 'center'
-        }}
+        <div
           className="desktop-nav"
+          style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}
         >
+          {/* Support — always visible */}
+          
+            href="https://t.me/russmarket2023"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+              color: 'var(--text-muted)', fontSize: '0.875rem'
+            }}
+          >
+            <TelegramIcon />
+            Support
+          </a>
+
           {user ? (
             <>
               <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
@@ -120,19 +139,41 @@ export default function Nav() {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div style={{
-          backgroundColor: 'var(--bg-card)',
-          borderBottom: '1px solid var(--border)',
-          padding: '1rem 2rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.75rem',
-          position: 'sticky',
-          top: '57px',
-          zIndex: 39
-        }}
+        <div
           className="mobile-menu"
+          style={{
+            backgroundColor: 'var(--bg-card)',
+            borderBottom: '1px solid var(--border)',
+            padding: '1rem 2rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem',
+            position: 'sticky',
+            top: '57px',
+            zIndex: 39
+          }}
         >
+          {/* Support link — always first */}
+          
+            href="https://t.me/russmarket2023"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMenuOpen(false)}
+            style={{
+              color: '#29b6f6',
+              fontSize: '0.95rem',
+              padding: '0.5rem 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem'
+            }}
+          >
+            <TelegramIcon />
+            Support
+          </a>
+
+          <div style={{ borderTop: '1px solid var(--border)' }} />
+
           {user ? (
             <>
               <div style={{
@@ -147,17 +188,14 @@ export default function Nav() {
                   {user.email}
                 </p>
               </div>
+
               
-              <a
                 href="/orders"
                 onClick={() => setMenuOpen(false)}
                 style={{
-                  color: 'var(--text-muted)',
-                  fontSize: '0.95rem',
-                  padding: '0.5rem 0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem'
+                  color: 'var(--text-muted)', fontSize: '0.95rem',
+                  padding: '0.5rem 0', display: 'flex',
+                  alignItems: 'center', gap: '0.75rem'
                 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -168,21 +206,17 @@ export default function Nav() {
                 </svg>
                 My Orders
               </a>
+
               <button
                 onClick={handleLogout}
                 style={{
                   backgroundColor: 'transparent',
                   border: '1px solid var(--border)',
-                  color: '#f87171',
-                  padding: '0.6rem 1rem',
-                  borderRadius: '8px',
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  width: '100%'
+                  color: '#f87171', padding: '0.6rem 1rem',
+                  borderRadius: '8px', fontSize: '0.9rem',
+                  cursor: 'pointer', textAlign: 'left',
+                  display: 'flex', alignItems: 'center',
+                  gap: '0.75rem', width: '100%'
                 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -196,16 +230,13 @@ export default function Nav() {
             </>
           ) : (
             <>
-              <a
+              
                 href="/login"
                 onClick={() => setMenuOpen(false)}
                 style={{
-                  color: 'var(--text-muted)',
-                  fontSize: '0.95rem',
-                  padding: '0.5rem 0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem'
+                  color: 'var(--text-muted)', fontSize: '0.95rem',
+                  padding: '0.5rem 0', display: 'flex',
+                  alignItems: 'center', gap: '0.75rem'
                 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -216,17 +247,13 @@ export default function Nav() {
                 </svg>
                 Login
               </a>
-              <a
+              
                 href="/signup"
                 onClick={() => setMenuOpen(false)}
                 style={{
-                  backgroundColor: 'var(--accent)',
-                  color: 'white',
-                  padding: '0.7rem 1rem',
-                  borderRadius: '8px',
-                  fontWeight: '600',
-                  fontSize: '0.95rem',
-                  textAlign: 'center'
+                  backgroundColor: 'var(--accent)', color: 'white',
+                  padding: '0.7rem 1rem', borderRadius: '8px',
+                  fontWeight: '600', fontSize: '0.95rem', textAlign: 'center'
                 }}
               >
                 Sign Up
