@@ -51,7 +51,7 @@ export default function Nav() {
           style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}
         >
           {/* Support — always visible */}
-          
+          <a
             href="https://t.me/russmarket2023"
             target="_blank"
             rel="noopener noreferrer"
@@ -154,7 +154,7 @@ export default function Nav() {
           }}
         >
           {/* Support link — always first */}
-          
+          <a
             href="https://t.me/russmarket2023"
             target="_blank"
             rel="noopener noreferrer"
@@ -189,7 +189,7 @@ export default function Nav() {
                 </p>
               </div>
 
-              
+              <a
                 href="/orders"
                 onClick={() => setMenuOpen(false)}
                 style={{
@@ -230,7 +230,7 @@ export default function Nav() {
             </>
           ) : (
             <>
-              
+              <a
                 href="/login"
                 onClick={() => setMenuOpen(false)}
                 style={{
@@ -247,7 +247,7 @@ export default function Nav() {
                 </svg>
                 Login
               </a>
-              
+              <a
                 href="/signup"
                 onClick={() => setMenuOpen(false)}
                 style={{
